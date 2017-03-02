@@ -30,8 +30,6 @@ int main() {
     int choise;
     double ans2;
     int needed_size;
-    FILE *f = fopen("power_iteration.txt", "a");
-    FILE *f1 = fopen("shifted_power_iteration.txt","a");
     printf("Press 1 for power iteration\n");
     printf("Press 2 for shifted power iteration\n");
     printf("Press anything for finding page rank\n");
@@ -40,11 +38,15 @@ int main() {
     scanf("%d",&choise);
 
     if(choise == 1){
+        FILE *f = fopen("power_iteration.txt", "w");
         ans2 = power_iteration(n,f,mat,vec,ans);
-        printf("%f\n",ans2);
+        printf("%lf\n",ans2);
+        fclose(f);
     }else if(choise == 2){
+        FILE *f1 = fopen("shifted_power_iteration.txt","w");
         ans2 = shifted_power_iteration(n,f1,mat,vec2,ans,shift);
-        printf("%f\n",ans2);
+        printf("%lf\n",ans2);
+        fclose(f1);
     }else{
         n = 1000;
         /*
@@ -73,7 +75,6 @@ int main() {
         free(row_ptr);
         free(vector);
     }
-    fclose(f);
     return 0;
 }
 
@@ -84,7 +85,7 @@ double power_iteration(int n, FILE *file, int* mat, double* vec, double ans){
     int i,j;
     double cal_ans = 1;
     double diff;
-    double *temp_vec = malloc(n*sizeof(int));
+    double *temp_vec = malloc(n*sizeof(double));
     double temp;
     int k = 0;
     diff = get_abs(ans - cal_ans);
@@ -93,7 +94,7 @@ double power_iteration(int n, FILE *file, int* mat, double* vec, double ans){
     for(i=0; i<n; i++){
         fprintf(file, "%.2f ",vec[i]);
     }
-    fprintf(file, "\t|\t%f\n",cal_ans);
+    fprintf(file, "\t|\t%lf\n",cal_ans);
     do{
         k++;
         for(i=0; i < n; i++){
@@ -103,18 +104,17 @@ double power_iteration(int n, FILE *file, int* mat, double* vec, double ans){
             }
             temp_vec[i] = temp;
         }
-        memcpy(vec,temp_vec,n*sizeof(int));
+        memcpy(vec,temp_vec,n*sizeof(double));
         cal_ans = get_max(n,vec);
         fprintf(file, "\t%d\t|\t",k);
         for(i=0; i<n; i++){
             vec[i] = vec[i] / cal_ans;
-            fprintf(file, "%.2f ",vec[i]);
+            fprintf(file, "%.2lf ",vec[i]);
         }
-        fprintf(file, "\t|\t%f\n",cal_ans);
+        fprintf(file, "\t|\t%lf\n",cal_ans);
 
         diff = get_abs(ans - cal_ans);
-        printf("%lf\n",cal_ans);
-    }while(diff > 0);
+    }while(diff > 0.0000001);
     free(temp_vec);
     return cal_ans;
 }
@@ -126,16 +126,16 @@ double shifted_power_iteration(int n, FILE *file, int* mat, double* vec, double 
     int i,j;
     double cal_ans = 1;
     double diff;
-    double *temp_vec = malloc(n*sizeof(int));
+    double *temp_vec = malloc(n*sizeof(double));
     double temp;
     int k = 0;
     diff = get_abs(ans - cal_ans);
     fprintf(file,"\tk\t|\t\tXk\t\t\t|\tYk\n");
     fprintf(file, "\t%d\t|\t",k);
     for(i=0; i<n; i++){
-        fprintf(file, "%.2f ",vec[i]);
+        fprintf(file, "%.2lf ",vec[i]);
     }
-    fprintf(file, "\t|\t%f\n",cal_ans);
+    fprintf(file, "\t|\t%lf\n",cal_ans);
     do{
         k++;
         for(i=0; i < n; i++){
@@ -148,18 +148,18 @@ double shifted_power_iteration(int n, FILE *file, int* mat, double* vec, double 
             }
             temp_vec[i] = temp;
         }
-        memcpy(vec,temp_vec,n*sizeof(int));
+        memcpy(vec,temp_vec,n*sizeof(double));
         cal_ans = get_max(n,vec) + shift;
         fprintf(file, "\t%d\t|\t",k);
         for(i=0; i<n; i++){
             vec[i] = vec[i] / (cal_ans - shift);
             fprintf(file, "%.2f ",vec[i]);
         }
-        fprintf(file, "\t|\t%f\n",cal_ans);
+        fprintf(file, "\t|\t%lf\n",cal_ans);
 
         diff = get_abs(ans - cal_ans);
 
-    }while(diff > 0);
+    }while(diff > 0.0000001);
     free(temp_vec);
     return cal_ans;
 }
